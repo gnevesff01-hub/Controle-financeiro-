@@ -3,200 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle Financeiro</title>
+<title>Finance Pro</title>
 
 <style>
 body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
-    background:#0b0f1a;
-    color:white;
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
+background:#0f172a;
+color:white;
 }
 
-.header{
-    padding:30px 20px 10px;
-}
-
-.header h1{
-    margin:0;
-    font-size:22px;
-    font-weight:600;
-}
-
-.sub{
-    color:#9ca3af;
-    font-size:14px;
+header{
+padding:25px 20px;
+font-size:22px;
+font-weight:600;
 }
 
 .container{
-    padding:20px;
+padding:0 20px 40px;
 }
 
 .card{
-    background:linear-gradient(145deg,#121826,#0e1422);
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.4);
-    margin-bottom:20px;
+background:#111827;
+border-radius:18px;
+padding:18px;
+margin-bottom:15px;
+box-shadow:0 8px 20px rgba(0,0,0,0.4);
 }
 
-.total{
-    font-size:14px;
-    color:#9ca3af;
+.title{
+font-size:16px;
+font-weight:600;
 }
 
-.valor{
-    font-size:26px;
-    font-weight:700;
-    margin-top:5px;
+.meta{
+font-size:13px;
+color:#9ca3af;
+margin-bottom:10px;
 }
 
 .progress{
-    height:14px;
-    background:#1f2937;
-    border-radius:20px;
-    margin-top:20px;
-    overflow:hidden;
+height:10px;
+background:#1f2937;
+border-radius:20px;
+overflow:hidden;
+margin:10px 0;
 }
 
 .bar{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#22c55e,#16a34a);
-    transition:0.6s ease;
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#22c55e,#16a34a);
+transition:0.5s;
 }
 
 .info{
-    display:flex;
-    justify-content:space-between;
-    margin-top:15px;
-    font-size:14px;
-}
-
-input{
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:none;
-    margin-top:10px;
-    font-size:15px;
-    background:#1f2937;
-    color:white;
+display:flex;
+justify-content:space-between;
+font-size:13px;
 }
 
 button{
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:none;
-    margin-top:10px;
-    font-size:16px;
-    font-weight:600;
-    background:#22c55e;
-    color:white;
+border:none;
+border-radius:12px;
+padding:10px;
+font-size:13px;
+margin-top:8px;
+cursor:pointer;
 }
 
-button:active{
-    transform:scale(0.98);
+.add{
+width:100%;
+padding:14px;
+font-size:15px;
+background:#22c55e;
+color:white;
+margin-bottom:20px;
 }
 
-.history{
-    margin-top:20px;
+.pay{
+background:#2563eb;
+color:white;
+width:100%;
 }
 
-.history-item{
-    background:#111827;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:10px;
-    display:flex;
-    justify-content:space-between;
-    font-size:14px;
+.reset{
+background:#f59e0b;
+color:white;
+width:48%;
+}
+
+.delete{
+background:#dc2626;
+color:white;
+width:48%;
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+}
+
+input{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:8px;
+background:#1f2937;
+color:white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <h1>Controle de Quitação</h1>
-    <div class="sub">Meta: R$ 8.000</div>
-</div>
+<header>Finance Pro</header>
 
 <div class="container">
 
-    <div class="card">
-        <div class="total">Valor Pago</div>
-        <div class="valor">R$ <span id="pago">0</span></div>
+<button class="add" onclick="novaMeta()">+ Nova Quitação</button>
 
-        <div class="progress">
-            <div class="bar" id="bar"></div>
-        </div>
-
-        <div class="info">
-            <div>Restante: R$ <span id="restante">8000</span></div>
-            <div><span id="percent">0%</span></div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="total">Registrar pagamento</div>
-        <input type="number" id="valor" placeholder="Digite o valor pago">
-        <button onclick="pagar()">Confirmar Pagamento</button>
-    </div>
-
-    <div class="history">
-        <div class="total">Histórico</div>
-        <div id="lista"></div>
-    </div>
+<div id="metas"></div>
 
 </div>
 
 <script>
-let total = 8000;
-let pago = Number(localStorage.getItem("pago")) || 0;
-let historico = JSON.parse(localStorage.getItem("historico")) || [];
+let metas = JSON.parse(localStorage.getItem("metas")) || [];
 
-function atualizar(){
-    let porcentagem = (pago / total) * 100;
-    document.getElementById("bar").style.width = porcentagem + "%";
-    document.getElementById("percent").innerText = porcentagem.toFixed(1) + "%";
-    document.getElementById("pago").innerText = pago.toLocaleString("pt-BR");
-    document.getElementById("restante").innerText = (total - pago).toLocaleString("pt-BR");
-
-    localStorage.setItem("pago", pago);
-    localStorage.setItem("historico", JSON.stringify(historico));
-
-    renderHistorico();
+function salvar(){
+localStorage.setItem("metas", JSON.stringify(metas));
 }
 
-function pagar(){
-    let valor = Number(document.getElementById("valor").value);
-    if(valor > 0){
-        pago += valor;
-        historico.unshift({
-            valor: valor,
-            data: new Date().toLocaleDateString("pt-BR")
-        });
-        document.getElementById("valor").value = "";
-        atualizar();
-    }
+function novaMeta(){
+let nome = prompt("Nome da quitação:");
+let valor = Number(prompt("Valor total da dívida:"));
+
+if(nome && valor > 0){
+metas.push({nome:nome,total:valor,pago:0});
+salvar();
+render();
+}
 }
 
-function renderHistorico(){
-    let lista = document.getElementById("lista");
-    lista.innerHTML = "";
-    historico.forEach(item=>{
-        lista.innerHTML += `
-            <div class="history-item">
-                <div>R$ ${item.valor.toLocaleString("pt-BR")}</div>
-                <div>${item.data}</div>
-            </div>
-        `;
-    });
+function pagar(index){
+let valor = Number(prompt("Valor do pagamento:"));
+if(valor > 0){
+metas[index].pago += valor;
+salvar();
+render();
+}
 }
 
-atualizar();
+function resetar(index){
+if(confirm("Deseja zerar essa quitação?")){
+metas[index].pago = 0;
+salvar();
+render();
+}
+}
+
+function excluir(index){
+if(confirm("Deseja excluir essa quitação?")){
+metas.splice(index,1);
+salvar();
+render();
+}
+}
+
+function render(){
+let container = document.getElementById("metas");
+container.innerHTML="";
+
+metas.forEach((meta,index)=>{
+
+let porcentagem = (meta.pago/meta.total)*100;
+if(porcentagem > 100) porcentagem = 100;
+
+container.innerHTML += `
+<div class="card">
+<div class="title">${meta.nome}</div>
+<div class="meta">Meta: R$ ${meta.total.toLocaleString("pt-BR")}</div>
+
+<div class="progress">
+<div class="bar" style="width:${porcentagem}%"></div>
+</div>
+
+<div class="info">
+<div>Pago: R$ ${meta.pago.toLocaleString("pt-BR")}</div>
+<div>${porcentagem.toFixed(1)}%</div>
+</div>
+
+<button class="pay" onclick="pagar(${index})">Registrar Pagamento</button>
+
+<div class="actions">
+<button class="reset" onclick="resetar(${index})">Resetar</button>
+<button class="delete" onclick="excluir(${index})">Excluir</button>
+</div>
+</div>
+`;
+});
+}
+
+render();
 </script>
 
 </body>
