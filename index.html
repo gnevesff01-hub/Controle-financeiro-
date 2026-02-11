@@ -3,219 +3,246 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Pro</title>
+<title>Finance Digital</title>
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
 body{
-margin:0;
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
-background:linear-gradient(135deg,#0f172a,#0b1120);
-color:#e5e7eb;
+background:linear-gradient(160deg,#0f172a,#1e293b);
+color:white;
 min-height:100vh;
 }
 
 header{
-padding:30px 20px 10px;
-font-size:22px;
+padding:25px 20px;
+font-size:20px;
 font-weight:600;
-color:#ffffff;
 }
 
 .container{
-padding:0 20px 40px;
+padding:0 20px 80px;
 }
 
 .card{
-background:rgba(17,24,39,0.85);
-backdrop-filter:blur(10px);
-border:1px solid rgba(255,255,255,0.05);
-border-radius:20px;
-padding:20px;
-margin-bottom:18px;
+background:rgba(30,41,59,0.9);
+border-radius:18px;
+padding:18px;
+margin-bottom:15px;
 box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 .title{
-font-size:16px;
+font-size:14px;
+color:#94a3b8;
+}
+
+.value{
+font-size:22px;
 font-weight:600;
-color:#ffffff;
-}
-
-.meta{
-font-size:13px;
-color:#9ca3af;
-margin-bottom:12px;
-}
-
-.progress{
-height:10px;
-background:#1f2937;
-border-radius:20px;
-overflow:hidden;
-margin:12px 0;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#22c55e,#16a34a);
-transition:0.6s ease;
-}
-
-.info{
-display:flex;
-justify-content:space-between;
-font-size:13px;
-color:#cbd5e1;
+margin-top:5px;
 }
 
 button{
-border:none;
-border-radius:14px;
-padding:12px;
-font-size:13px;
-margin-top:10px;
-cursor:pointer;
-font-weight:500;
-transition:0.2s;
-}
-
-button:active{
-transform:scale(0.97);
-}
-
-.add{
 width:100%;
-padding:15px;
-font-size:15px;
-background:linear-gradient(90deg,#6366f1,#4f46e5);
-color:white;
-margin-bottom:25px;
-}
-
-.pay{
+padding:12px;
+border:none;
+border-radius:12px;
+margin-top:10px;
+font-weight:500;
 background:#2563eb;
 color:white;
-width:100%;
-}
-
-.reset{
-background:#f59e0b;
-color:white;
-width:48%;
-}
-
-.delete{
-background:#dc2626;
-color:white;
-width:48%;
-}
-
-.actions{
-display:flex;
-justify-content:space-between;
 }
 
 input{
 width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.08);
+padding:10px;
 margin-top:8px;
+border-radius:10px;
+border:none;
 background:#0f172a;
 color:white;
 }
+
+.nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#111827;
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+border-top:1px solid #1f2937;
+}
+
+.nav button{
+background:none;
+border:none;
+color:#94a3b8;
+font-size:12px;
+}
+
+.nav button.active{
+color:#2563eb;
+font-weight:600;
+}
+
+.hidden{display:none;}
 </style>
 </head>
 
 <body>
 
-<header>Finance Pro</header>
+<header id="pageTitle">Dashboard</header>
 
 <div class="container">
 
-<button class="add" onclick="novaMeta()">+ Nova Quitação</button>
+<!-- DASHBOARD -->
+<div id="dashboard">
 
-<div id="metas"></div>
+<div class="card">
+<div class="title">Saldo Atual</div>
+<div class="value" id="saldo">R$ 0</div>
+</div>
 
+<div class="card">
+<div class="title">Receitas do Mês</div>
+<div class="value" id="totalReceitas">R$ 0</div>
+</div>
+
+<div class="card">
+<div class="title">Despesas do Mês</div>
+<div class="value" id="totalDespesas">R$ 0</div>
+</div>
+
+</div>
+
+<!-- RECEITAS -->
+<div id="receitas" class="hidden">
+<div class="card">
+<input type="number" id="valorReceita" placeholder="Valor da receita">
+<button onclick="addReceita()">Adicionar Receita</button>
+</div>
+<div id="listaReceitas"></div>
+</div>
+
+<!-- DESPESAS -->
+<div id="despesas" class="hidden">
+<div class="card">
+<input type="number" id="valorDespesa" placeholder="Valor da despesa">
+<button onclick="addDespesa()">Adicionar Despesa</button>
+</div>
+<div id="listaDespesas"></div>
+</div>
+
+<!-- METAS -->
+<div id="metas" class="hidden">
+<div class="card">
+<input type="text" id="nomeMeta" placeholder="Nome da meta">
+<input type="number" id="valorMeta" placeholder="Valor total">
+<button onclick="addMeta()">Criar Meta</button>
+</div>
+<div id="listaMetas"></div>
+</div>
+
+</div>
+
+<!-- NAVEGAÇÃO -->
+<div class="nav">
+<button onclick="showPage('dashboard',this)" class="active">Home</button>
+<button onclick="showPage('receitas',this)">Receitas</button>
+<button onclick="showPage('despesas',this)">Despesas</button>
+<button onclick="showPage('metas',this)">Metas</button>
 </div>
 
 <script>
-let metas = JSON.parse(localStorage.getItem("metas")) || [];
+let receitas = JSON.parse(localStorage.getItem("receitas"))||[];
+let despesas = JSON.parse(localStorage.getItem("despesas"))||[];
+let metas = JSON.parse(localStorage.getItem("metas"))||[];
 
 function salvar(){
-localStorage.setItem("metas", JSON.stringify(metas));
+localStorage.setItem("receitas",JSON.stringify(receitas));
+localStorage.setItem("despesas",JSON.stringify(despesas));
+localStorage.setItem("metas",JSON.stringify(metas));
 }
 
-function novaMeta(){
-let nome = prompt("Nome da quitação:");
-let valor = Number(prompt("Valor total da dívida:"));
-if(nome && valor > 0){
+function atualizarDashboard(){
+let totalReceitas = receitas.reduce((a,b)=>a+b,0);
+let totalDespesas = despesas.reduce((a,b)=>a+b,0);
+let saldo = totalReceitas-totalDespesas;
+
+document.getElementById("totalReceitas").innerText="R$ "+totalReceitas.toLocaleString("pt-BR");
+document.getElementById("totalDespesas").innerText="R$ "+totalDespesas.toLocaleString("pt-BR");
+document.getElementById("saldo").innerText="R$ "+saldo.toLocaleString("pt-BR");
+}
+
+function addReceita(){
+let v=Number(document.getElementById("valorReceita").value);
+if(v>0){receitas.push(v);salvar();renderReceitas();}
+}
+
+function addDespesa(){
+let v=Number(document.getElementById("valorDespesa").value);
+if(v>0){despesas.push(v);salvar();renderDespesas();}
+}
+
+function addMeta(){
+let nome=document.getElementById("nomeMeta").value;
+let valor=Number(document.getElementById("valorMeta").value);
+if(nome && valor>0){
 metas.push({nome:nome,total:valor,pago:0});
 salvar();
-render();
+renderMetas();
 }
 }
 
-function pagar(index){
-let valor = Number(prompt("Valor do pagamento:"));
-if(valor > 0){
-metas[index].pago += valor;
-salvar();
-render();
-}
-}
-
-function resetar(index){
-if(confirm("Deseja zerar essa quitação?")){
-metas[index].pago = 0;
-salvar();
-render();
-}
+function renderReceitas(){
+let lista=document.getElementById("listaReceitas");
+lista.innerHTML="";
+receitas.forEach(v=>{
+lista.innerHTML+=`<div class="card">+ R$ ${v.toLocaleString("pt-BR")}</div>`;
+});
+atualizarDashboard();
 }
 
-function excluir(index){
-if(confirm("Deseja excluir essa quitação?")){
-metas.splice(index,1);
-salvar();
-render();
+function renderDespesas(){
+let lista=document.getElementById("listaDespesas");
+lista.innerHTML="";
+despesas.forEach(v=>{
+lista.innerHTML+=`<div class="card">- R$ ${v.toLocaleString("pt-BR")}</div>`;
+});
+atualizarDashboard();
 }
-}
 
-function render(){
-let container = document.getElementById("metas");
-container.innerHTML="";
-
-metas.forEach((meta,index)=>{
-let porcentagem = (meta.pago/meta.total)*100;
-if(porcentagem > 100) porcentagem = 100;
-
-container.innerHTML += `
+function renderMetas(){
+let lista=document.getElementById("listaMetas");
+lista.innerHTML="";
+metas.forEach(m=>{
+let p=(m.pago/m.total)*100||0;
+lista.innerHTML+=`
 <div class="card">
-<div class="title">${meta.nome}</div>
-<div class="meta">Meta: R$ ${meta.total.toLocaleString("pt-BR")}</div>
-
-<div class="progress">
-<div class="bar" style="width:${porcentagem}%"></div>
-</div>
-
-<div class="info">
-<div>Pago: R$ ${meta.pago.toLocaleString("pt-BR")}</div>
-<div>${porcentagem.toFixed(1)}%</div>
-</div>
-
-<button class="pay" onclick="pagar(${index})">Registrar Pagamento</button>
-
-<div class="actions">
-<button class="reset" onclick="resetar(${index})">Resetar</button>
-<button class="delete" onclick="excluir(${index})">Excluir</button>
-</div>
-</div>
-`;
+<div class="title">${m.nome}</div>
+<div class="value">${p.toFixed(1)}%</div>
+</div>`;
 });
 }
 
-render();
+function showPage(id,btn){
+document.querySelectorAll(".container > div").forEach(p=>p.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+
+document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+
+document.getElementById("pageTitle").innerText=btn.innerText;
+}
+
+renderReceitas();
+renderDespesas();
+renderMetas();
+atualizarDashboard();
 </script>
 
 </body>
