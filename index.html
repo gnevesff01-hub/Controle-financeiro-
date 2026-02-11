@@ -1,1 +1,107 @@
-index.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro</title>
+
+<style>
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+.card{
+width:90%;
+max-width:400px;
+background:#020617;
+padding:20px;
+border-radius:20px;
+}
+h1{
+text-align:center;
+color:#facc15;
+}
+.progress{
+height:40px;
+background:#1e293b;
+border-radius:30px;
+overflow:hidden;
+margin:20px 0;
+}
+.bar{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#facc15,#fde047);
+transition:0.5s;
+}
+.percent{
+text-align:center;
+font-weight:bold;
+margin-top:-30px;
+}
+input,button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:12px;
+border:none;
+font-size:16px;
+}
+button{
+background:#facc15;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h1>Quitação R$ 8.000</h1>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<div class="percent" id="percent">0%</div>
+
+<div>Pago: R$ <span id="pago">0</span></div>
+<div>Restante: R$ <span id="restante">8000</span></div>
+
+<input type="number" id="valor" placeholder="Digite o valor pago">
+<button onclick="pagar()">Registrar Pagamento</button>
+</div>
+
+<script>
+let total=8000;
+let pago=Number(localStorage.getItem("pago"))||0;
+
+function atualizar(){
+let porcentagem=(pago/total)*100;
+document.getElementById("bar").style.width=porcentagem+"%";
+document.getElementById("percent").innerText=porcentagem.toFixed(1)+"%";
+document.getElementById("pago").innerText=pago;
+document.getElementById("restante").innerText=total-pago;
+localStorage.setItem("pago",pago);
+}
+
+function pagar(){
+let valor=Number(document.getElementById("valor").value);
+if(valor>0){
+pago+=valor;
+document.getElementById("valor").value="";
+atualizar();
+}
+}
+
+atualizar();
+</script>
+
+</body>
+</html>
