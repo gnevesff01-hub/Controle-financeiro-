@@ -7,97 +7,193 @@
 
 <style>
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
-background:#0f172a;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
+    background:#0b0f1a;
+    color:white;
 }
+
+.header{
+    padding:30px 20px 10px;
+}
+
+.header h1{
+    margin:0;
+    font-size:22px;
+    font-weight:600;
+}
+
+.sub{
+    color:#9ca3af;
+    font-size:14px;
+}
+
+.container{
+    padding:20px;
+}
+
 .card{
-width:90%;
-max-width:400px;
-background:#020617;
-padding:20px;
-border-radius:20px;
+    background:linear-gradient(145deg,#121826,#0e1422);
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    margin-bottom:20px;
 }
-h1{
-text-align:center;
-color:#facc15;
+
+.total{
+    font-size:14px;
+    color:#9ca3af;
 }
+
+.valor{
+    font-size:26px;
+    font-weight:700;
+    margin-top:5px;
+}
+
 .progress{
-height:40px;
-background:#1e293b;
-border-radius:30px;
-overflow:hidden;
-margin:20px 0;
+    height:14px;
+    background:#1f2937;
+    border-radius:20px;
+    margin-top:20px;
+    overflow:hidden;
 }
+
 .bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#facc15,#fde047);
-transition:0.5s;
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#22c55e,#16a34a);
+    transition:0.6s ease;
 }
-.percent{
-text-align:center;
-font-weight:bold;
-margin-top:-30px;
+
+.info{
+    display:flex;
+    justify-content:space-between;
+    margin-top:15px;
+    font-size:14px;
 }
-input,button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:12px;
-border:none;
-font-size:16px;
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    margin-top:10px;
+    font-size:15px;
+    background:#1f2937;
+    color:white;
 }
+
 button{
-background:#facc15;
-font-weight:bold;
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    margin-top:10px;
+    font-size:16px;
+    font-weight:600;
+    background:#22c55e;
+    color:white;
+}
+
+button:active{
+    transform:scale(0.98);
+}
+
+.history{
+    margin-top:20px;
+}
+
+.history-item{
+    background:#111827;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-<h1>Quitação R$ 8.000</h1>
-
-<div class="progress">
-<div class="bar" id="bar"></div>
+<div class="header">
+    <h1>Controle de Quitação</h1>
+    <div class="sub">Meta: R$ 8.000</div>
 </div>
 
-<div class="percent" id="percent">0%</div>
+<div class="container">
 
-<div>Pago: R$ <span id="pago">0</span></div>
-<div>Restante: R$ <span id="restante">8000</span></div>
+    <div class="card">
+        <div class="total">Valor Pago</div>
+        <div class="valor">R$ <span id="pago">0</span></div>
 
-<input type="number" id="valor" placeholder="Digite o valor pago">
-<button onclick="pagar()">Registrar Pagamento</button>
+        <div class="progress">
+            <div class="bar" id="bar"></div>
+        </div>
+
+        <div class="info">
+            <div>Restante: R$ <span id="restante">8000</span></div>
+            <div><span id="percent">0%</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="total">Registrar pagamento</div>
+        <input type="number" id="valor" placeholder="Digite o valor pago">
+        <button onclick="pagar()">Confirmar Pagamento</button>
+    </div>
+
+    <div class="history">
+        <div class="total">Histórico</div>
+        <div id="lista"></div>
+    </div>
+
 </div>
 
 <script>
-let total=8000;
-let pago=Number(localStorage.getItem("pago"))||0;
+let total = 8000;
+let pago = Number(localStorage.getItem("pago")) || 0;
+let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
 function atualizar(){
-let porcentagem=(pago/total)*100;
-document.getElementById("bar").style.width=porcentagem+"%";
-document.getElementById("percent").innerText=porcentagem.toFixed(1)+"%";
-document.getElementById("pago").innerText=pago;
-document.getElementById("restante").innerText=total-pago;
-localStorage.setItem("pago",pago);
+    let porcentagem = (pago / total) * 100;
+    document.getElementById("bar").style.width = porcentagem + "%";
+    document.getElementById("percent").innerText = porcentagem.toFixed(1) + "%";
+    document.getElementById("pago").innerText = pago.toLocaleString("pt-BR");
+    document.getElementById("restante").innerText = (total - pago).toLocaleString("pt-BR");
+
+    localStorage.setItem("pago", pago);
+    localStorage.setItem("historico", JSON.stringify(historico));
+
+    renderHistorico();
 }
 
 function pagar(){
-let valor=Number(document.getElementById("valor").value);
-if(valor>0){
-pago+=valor;
-document.getElementById("valor").value="";
-atualizar();
+    let valor = Number(document.getElementById("valor").value);
+    if(valor > 0){
+        pago += valor;
+        historico.unshift({
+            valor: valor,
+            data: new Date().toLocaleDateString("pt-BR")
+        });
+        document.getElementById("valor").value = "";
+        atualizar();
+    }
 }
+
+function renderHistorico(){
+    let lista = document.getElementById("lista");
+    lista.innerHTML = "";
+    historico.forEach(item=>{
+        lista.innerHTML += `
+            <div class="history-item">
+                <div>R$ ${item.valor.toLocaleString("pt-BR")}</div>
+                <div>${item.data}</div>
+            </div>
+        `;
+    });
 }
 
 atualizar();
